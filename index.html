@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4 Months 💖</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section id="scene-1" class="scene active">
+      <img
+        class="emoji-gif"
+        src="https://media.tenor.com/6if7I6ecfBIAAAAi/waving-hello.gif"
+        alt="Waving emoji"
+      />
+      <h1>hey you 💕</h1>
+      <button data-next="scene-2">hi....</button>
+    </section>
+
+    <section id="scene-2" class="scene">
+      <div class="emoji">🤔</div>
+      <p>we've been dating for four months right</p>
+      <button data-next="scene-3">yes.</button>
+    </section>
+
+    <section id="scene-3" class="scene">
+      <p>soooo I just wanted to tell you the..</p>
+      <button data-next="scene-4">the...?</button>
+    </section>
+
+    <section id="scene-4" class="scene">
+      <h2>Reasons why I love you</h2>
+      <button id="show-reason">show a reason 💌</button>
+      <div id="reason-board" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
