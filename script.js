@@ -4,17 +4,16 @@ const showReasonBtn = document.getElementById('show-reason');
 const reasonBoard = document.getElementById('reason-board');
 const musicToggle = document.getElementById('music-toggle');
 const bgMusic = document.getElementById('bg-music');
-const clickSfx = document.getElementById('click-sfx');
 const heartLayer = document.getElementById('heart-layer');
+const typewriterTargets = [...document.querySelectorAll('.typewriter')];
 
 const MUSIC_PATH = 'audio/back-to-me.mp3';
-const CLICK_SFX_PATH = 'audio/button-press.mp3';
 
 let reasons = [];
 let firstUserInteractionDone = false;
-let musicAvailable;
-let clickSfxAvailable;
 let isTransitioning = false;
+let currentTypewriterController = null;
+let musicEnabled = false;
 
 function showScene(nextId) {
   if (isTransitioning) {
@@ -32,13 +31,17 @@ function showScene(nextId) {
 
   currentScene.classList.remove('active');
   currentScene.classList.add('leaving');
-
   nextScene.classList.add('entering');
+
+  if (currentTypewriterController) {
+    currentTypewriterController.cancelled = true;
+  }
 
   setTimeout(() => {
     currentScene.classList.remove('leaving');
     nextScene.classList.remove('entering');
     nextScene.classList.add('active');
+    runSceneTypewriter(nextScene);
     isTransitioning = false;
   }, 240);
 }
@@ -47,97 +50,105 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-async function hasClickSfxFile() {
-  if (typeof clickSfxAvailable === 'boolean') {
-    return clickSfxAvailable;
-  }
-
-  try {
-    const response = await fetch(CLICK_SFX_PATH, { method: 'HEAD' });
-    clickSfxAvailable = response.ok;
-  } catch {
-    clickSfxAvailable = false;
-  }
-
-  return clickSfxAvailable;
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function playClickSfx() {
-  if (!(await hasClickSfxFile())) {
-    return;
-  }
+async function typeText(element, text, controller) {
+  element.textContent = '';
+  element.classList.add('typing');
 
-  try {
-    if (!clickSfx.src) {
-      clickSfx.src = CLICK_SFX_PATH;
+  for (const char of text) {
+    if (controller.cancelled) {
+      element.classList.remove('typing');
+      return;
     }
 
-    const clickClone = clickSfx.cloneNode();
-    clickClone.volume = 0.5;
-    await clickClone.play();
-  } catch {
-    // Ignore if playback is blocked by browser policy.
+    element.textContent += char;
+    const speed = char === ' ' ? 12 : randomInt(24, 42);
+    await wait(speed);
   }
+
+  element.classList.remove('typing');
 }
 
-async function hasMusicFile() {
-  if (typeof musicAvailable === 'boolean') {
-    return musicAvailable;
-  }
-
-  try {
-    const response = await fetch(MUSIC_PATH, { method: 'HEAD' });
-    musicAvailable = response.ok;
-  } catch {
-    musicAvailable = false;
-  }
-
-  return musicAvailable;
-}
-
-async function tryStartMusic() {
-  if (!bgMusic.paused) {
+function runSceneTypewriter(scene) {
+  const elements = [...scene.querySelectorAll('.typewriter')];
+  if (!elements.length) {
     return;
   }
 
-  if (!(await hasMusicFile())) {
+  const controller = { cancelled: false };
+  currentTypewriterController = controller;
+
+  const run = async () => {
+    for (const element of elements) {
+      const text = element.dataset.text || '';
+      await typeText(element, text, controller);
+      await wait(80);
+      if (controller.cancelled) {
+        return;
+      }
+    }
+  };
+
+  void run();
+}
+
+function setupMusic() {
+  bgMusic.src = MUSIC_PATH;
+  bgMusic.volume = 0.25;
+
+  bgMusic.addEventListener('playing', () => {
+    musicEnabled = true;
+    musicToggle.textContent = '🎵 music on';
+  });
+
+  bgMusic.addEventListener('pause', () => {
+    if (!bgMusic.ended) {
+      musicEnabled = false;
+      musicToggle.textContent = '🎵 music off';
+    }
+  });
+
+  bgMusic.addEventListener('error', () => {
+    musicEnabled = false;
     musicToggle.textContent = '🎵 add song file';
-    return;
-  }
+  });
 
+  bgMusic.load();
+}
+
+
+async function startMusicFromGesture() {
   try {
-    if (!bgMusic.src) {
-      bgMusic.src = MUSIC_PATH;
-    }
-    bgMusic.volume = 0.2;
     await bgMusic.play();
+    musicEnabled = true;
     musicToggle.textContent = '🎵 music on';
   } catch {
+    musicEnabled = false;
     musicToggle.textContent = '🎵 tap for music';
   }
 }
 
 nextButtons.forEach((button) => {
   button.addEventListener('click', async () => {
-    void playClickSfx();
     showScene(button.dataset.next);
 
     if (!firstUserInteractionDone) {
       firstUserInteractionDone = true;
-      await tryStartMusic();
+      await startMusicFromGesture();
     }
   });
 });
 
 musicToggle.addEventListener('click', async () => {
-  void playClickSfx();
-
-  if (bgMusic.paused) {
-    await tryStartMusic();
-  } else {
+  if (musicEnabled && !bgMusic.paused) {
     bgMusic.pause();
-    musicToggle.textContent = '🎵 music off';
+    return;
   }
+
+  await startMusicFromGesture();
 });
 
 async function loadReasons() {
@@ -162,16 +173,14 @@ function addReasonToBoard(reasonText) {
   const boardRect = reasonBoard.getBoundingClientRect();
   const reasonRect = reason.getBoundingClientRect();
 
-  const maxX = Math.max(0, boardRect.width - reasonRect.width - 8);
-  const maxY = Math.max(0, boardRect.height - reasonRect.height - 8);
+  const maxX = Math.max(4, Math.floor(boardRect.width - reasonRect.width - 8));
+  const maxY = Math.max(4, Math.floor(boardRect.height - reasonRect.height - 8));
 
-  reason.style.left = `${randomInt(4, Math.floor(maxX))}px`;
-  reason.style.top = `${randomInt(4, Math.floor(maxY))}px`;
+  reason.style.left = `${randomInt(4, maxX)}px`;
+  reason.style.top = `${randomInt(4, maxY)}px`;
 }
 
 showReasonBtn.addEventListener('click', () => {
-  void playClickSfx();
-
   if (!reasons.length) {
     addReasonToBoard('Add reasons in reasons.txt 💖');
     return;
@@ -196,5 +205,14 @@ function spawnHeart() {
   }, 13000);
 }
 
-loadReasons();
+for (const element of typewriterTargets) {
+  if (!element.dataset.text) {
+    element.dataset.text = element.textContent || '';
+  }
+  element.textContent = '';
+}
+
+setupMusic();
+runSceneTypewriter(document.querySelector('.scene.active'));
+void loadReasons();
 setInterval(spawnHeart, 850);
