@@ -7,14 +7,10 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="heart-layer" aria-hidden="true"></div>
-
-  <button id="music-toggle" type="button" aria-label="Toggle background music">🎵 music</button>
-
   <main class="app">
     <section id="scene-1" class="scene active">
       <img
-        class="emoji-gif wave"
+        class="emoji-gif"
         src="https://media.tenor.com/6if7I6ecfBIAAAAi/waving-hello.gif"
         alt="Waving emoji"
       />
@@ -23,7 +19,7 @@
     </section>
 
     <section id="scene-2" class="scene">
-      <div class="emoji think">🤔</div>
+      <div class="emoji">🤔</div>
       <p>we've been dating for four months right</p>
       <button data-next="scene-3">yes.</button>
     </section>
@@ -39,8 +35,6 @@
       <div id="reason-board" aria-live="polite"></div>
     </section>
   </main>
-
-  <audio id="bg-music" loop preload="none"></audio>
 
   <script src="script.js"></script>
 </body>

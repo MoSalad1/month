@@ -16,40 +16,9 @@ body {
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   background: radial-gradient(circle at top, #ffd8ee 0%, var(--bg) 55%);
   color: var(--text);
-  overflow: hidden;
-}
-
-#heart-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.heart {
-  position: absolute;
-  bottom: -24px;
-  opacity: 0.55;
-  animation: float-up linear forwards;
-  filter: drop-shadow(0 2px 6px rgba(255, 105, 180, 0.35));
-}
-
-@keyframes float-up {
-  0% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0;
-  }
-  10% { opacity: 0.6; }
-  100% {
-    transform: translateY(-112dvh) translateX(var(--drift, 0px)) scale(1.15);
-    opacity: 0;
-  }
 }
 
 .app {
-  position: relative;
-  z-index: 1;
   min-height: 100dvh;
   display: flex;
   align-items: center;
@@ -68,18 +37,6 @@ body {
   border-radius: 1rem;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
   padding: 1.25rem;
-  animation: scene-in 280ms ease;
-}
-
-@keyframes scene-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 .scene.active {
@@ -92,26 +49,8 @@ body {
   object-fit: contain;
 }
 
-.wave {
-  animation: bob 1.4s ease-in-out infinite;
-}
-
 .emoji {
   font-size: 4rem;
-}
-
-.think {
-  animation: bob 2s ease-in-out infinite;
-}
-
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
 }
 
 button {
@@ -123,24 +62,10 @@ button {
   padding: 0.75rem 1.25rem;
   cursor: pointer;
   font-weight: 700;
-  transition: transform 120ms ease, filter 120ms ease;
-}
-
-button:hover {
-  filter: brightness(1.05);
 }
 
 button:active {
-  transform: scale(0.97);
-}
-
-#music-toggle {
-  position: fixed;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 2;
-  font-size: 0.92rem;
-  padding: 0.55rem 0.95rem;
+  transform: scale(0.98);
 }
 
 #scene-4 {
@@ -166,16 +91,4 @@ button:active {
   box-shadow: 0 4px 10px rgba(91, 37, 73, 0.15);
   line-height: 1.25;
   font-size: 0.95rem;
-  animation: pop-in 220ms ease;
-}
-
-@keyframes pop-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }

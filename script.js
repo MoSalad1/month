@@ -2,16 +2,8 @@ const scenes = [...document.querySelectorAll('.scene')];
 const nextButtons = [...document.querySelectorAll('button[data-next]')];
 const showReasonBtn = document.getElementById('show-reason');
 const reasonBoard = document.getElementById('reason-board');
-const musicToggle = document.getElementById('music-toggle');
-const bgMusic = document.getElementById('bg-music');
-const heartLayer = document.getElementById('heart-layer');
-
-const MUSIC_PATH = 'audio/back-to-me.mp3';
 
 let reasons = [];
-let audioContext;
-let firstUserInteractionDone = false;
-let musicAvailable;
 
 function showScene(nextId) {
   scenes.forEach((scene) => {
@@ -19,91 +11,10 @@ function showScene(nextId) {
   });
 }
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function playClickTone() {
-  if (!audioContext) {
-    audioContext = new window.AudioContext();
-  }
-
-  const now = audioContext.currentTime;
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(740, now);
-  oscillator.frequency.exponentialRampToValueAtTime(520, now + 0.12);
-
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
-
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + 0.14);
-}
-
-async function hasMusicFile() {
-  if (typeof musicAvailable === 'boolean') {
-    return musicAvailable;
-  }
-
-  try {
-    const response = await fetch(MUSIC_PATH, { method: 'HEAD' });
-    musicAvailable = response.ok;
-  } catch {
-    musicAvailable = false;
-  }
-
-  return musicAvailable;
-}
-
-async function tryStartMusic() {
-  if (!bgMusic.paused) {
-    return;
-  }
-
-  if (!(await hasMusicFile())) {
-    musicToggle.textContent = '🎵 add song file';
-    return;
-  }
-
-  try {
-    if (!bgMusic.src) {
-      bgMusic.src = MUSIC_PATH;
-    }
-    bgMusic.volume = 0.2;
-    await bgMusic.play();
-    musicToggle.textContent = '🎵 music on';
-  } catch {
-    musicToggle.textContent = '🎵 tap for music';
-  }
-}
-
 nextButtons.forEach((button) => {
-  button.addEventListener('click', async () => {
-    playClickTone();
+  button.addEventListener('click', () => {
     showScene(button.dataset.next);
-
-    if (!firstUserInteractionDone) {
-      firstUserInteractionDone = true;
-      await tryStartMusic();
-    }
   });
-});
-
-musicToggle.addEventListener('click', async () => {
-  playClickTone();
-
-  if (bgMusic.paused) {
-    await tryStartMusic();
-  } else {
-    bgMusic.pause();
-    musicToggle.textContent = '🎵 music off';
-  }
 });
 
 async function loadReasons() {
@@ -117,6 +28,10 @@ async function loadReasons() {
   } catch {
     reasons = ['I love you.'];
   }
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function addReasonToBoard(reasonText) {
@@ -136,8 +51,6 @@ function addReasonToBoard(reasonText) {
 }
 
 showReasonBtn.addEventListener('click', () => {
-  playClickTone();
-
   if (!reasons.length) {
     addReasonToBoard('Add reasons in reasons.txt 💖');
     return;
@@ -147,20 +60,4 @@ showReasonBtn.addEventListener('click', () => {
   addReasonToBoard(pick);
 });
 
-function spawnHeart() {
-  const heart = document.createElement('span');
-  heart.className = 'heart';
-  heart.textContent = '💖';
-  heart.style.left = `${randomInt(2, 96)}%`;
-  heart.style.fontSize = `${randomInt(10, 24)}px`;
-  heart.style.animationDuration = `${randomInt(7, 12)}s`;
-  heart.style.setProperty('--drift', `${randomInt(-30, 30)}px`);
-  heartLayer.appendChild(heart);
-
-  setTimeout(() => {
-    heart.remove();
-  }, 13000);
-}
-
 loadReasons();
-setInterval(spawnHeart, 850);
