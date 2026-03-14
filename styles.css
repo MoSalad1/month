@@ -1,0 +1,94 @@
+:root {
+  --bg: #fff5fb;
+  --text: #5b2549;
+  --btn: #ff69b4;
+  --btn-text: #ffffff;
+  --card: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #ffd8ee 0%, var(--bg) 55%);
+  color: var(--text);
+}
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.scene {
+  width: min(100%, 420px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  background: color-mix(in srgb, var(--card) 90%, #ffd7ef);
+  border-radius: 1rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  padding: 1.25rem;
+}
+
+.scene.active {
+  display: flex;
+}
+
+.emoji-gif {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+.emoji {
+  font-size: 4rem;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--btn-text);
+  font-size: 1rem;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+#scene-4 {
+  width: min(100%, 500px);
+}
+
+#reason-board {
+  width: 100%;
+  height: min(62dvh, 420px);
+  border-radius: 0.9rem;
+  background: #fff;
+  border: 2px dashed #ffc2e5;
+  position: relative;
+  overflow: hidden;
+}
+
+.reason {
+  position: absolute;
+  max-width: 72%;
+  padding: 0.6rem 0.75rem;
+  background: #ffe6f5;
+  border-radius: 0.7rem;
+  box-shadow: 0 4px 10px rgba(91, 37, 73, 0.15);
+  line-height: 1.25;
+  font-size: 0.95rem;
+}
