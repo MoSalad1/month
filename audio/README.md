@@ -1,6 +1,5 @@
-Place your local song files here as:
+Place your local song file here as:
 
-- `audio/back-to-me.mp3` (background music)
-- `audio/button-press.mp3` (button press sound effect)
+- `audio/back-to-me.mp3`
 
-The site will automatically enable each sound when its file exists.
+The site will automatically enable background music when this file exists.
